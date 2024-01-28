@@ -1,6 +1,5 @@
 package templates
 
-import java.util.concurrent.Flow
 import kotlinx.html.ButtonType
 import kotlinx.html.FlowContent
 import kotlinx.html.InputType
@@ -132,7 +131,7 @@ fun FlowContent.lastAction(action: String) = div {
 
         "Small Blind" -> {
             classes = setOf("border-2 border-yellow-900 rounded-md px-4 bg-yellow-200 text-yellow-900")
-            +"Big Blind"
+            +"Small Blind"
         }
     }
 }

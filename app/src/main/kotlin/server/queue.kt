@@ -5,7 +5,7 @@ import logic.createInitialHandState
 
 fun createAvailableGames() {
     if (playersInQueue.size > 1) {
-        val gameId = idGenerator.nextInt()
+        val gameId = idGenerator.nextInt(0, 500)
         val player1 = playersInQueue.removeFirst()
         val player2 = playersInQueue.removeFirst()
         games.add(

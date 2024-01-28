@@ -12,15 +12,12 @@ import server.endpoints
 
 
 fun main() {
-    val games = mutableListOf<WebsocketGame>()
-
     embeddedServer(Netty, port = 8080) {
         install(WebSockets) {
-            pingPeriod = Duration.ofSeconds(15)
-            timeout = Duration.ofSeconds(15)
+            pingPeriodMillis = 0L
             maxFrameSize = Long.MAX_VALUE
             masking = false
         }
-        endpoints(games)
+        endpoints()
     }.start(wait = true)
 }

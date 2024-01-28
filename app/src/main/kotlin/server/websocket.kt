@@ -10,6 +10,7 @@ import io.ktor.utils.io.core.buildPacket
 import io.ktor.utils.io.core.readBytes
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.send
+import java.util.Collections
 import kotlin.math.min
 import kotlinx.coroutines.delay
 import kotlinx.html.FlowContent
@@ -19,6 +20,7 @@ import kotlinx.html.div
 import kotlinx.html.h1
 import kotlinx.html.html
 import kotlinx.html.stream.appendHTML
+import kotlinx.serialization.Serializable
 import logic.Card
 import logic.HandState
 import logic.finishTurnForSeat
@@ -56,10 +58,10 @@ data class Action(
     val amount: Int,
 )
 
-val playersInQueue = mutableListOf<Int>()
-val games = mutableListOf<WebsocketGame>()
+val playersInQueue: MutableList<Int> = Collections.synchronizedList(mutableListOf<Int>())
+val games: MutableList<WebsocketGame> = Collections.synchronizedList(mutableListOf<WebsocketGame>())
 
-private suspend fun WebsocketGame.handleAction(playerId: Int, action: Action) {
+suspend fun WebsocketGame.handleAction(playerId: Int, action: Action) {
     val seatId = hand.seats.indexOfFirst { it.playerId == playerId }
     hand = when (action.action) {
         "CheckFold" -> hand.performCheckFold(seatId)
@@ -173,7 +175,6 @@ suspend fun WebSocketSession.sendNewUIChangesInPlayerState(
     if (newState.lastAction != previousState?.lastAction) send { playerLastAction(newState.lastAction) }
     if (newState.actions != previousState?.actions) send { actions(newState.actions) }
     if (newState.pot != previousState?.pot) send { pot(newState.pot) }
-    flush()
 }
 
 private suspend fun WebSocketSession.send(block: FlowContent.() -> Unit) {
