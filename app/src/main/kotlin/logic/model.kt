@@ -33,5 +33,4 @@ data class HandState(
     val finished: Boolean,
     val gameFinished: Boolean,
     val winners: List<Int>,
-
 )
