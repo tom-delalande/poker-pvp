@@ -53,7 +53,7 @@ fun HandState.finishTurnForSeat(seatId: Int): HandState {
         return copy(
             winners = seatsIn,
             finished = true,
-        )
+        ).finishHand()
     }
 
     var newSeatInTurn = (currentAction.seatInTurn + 1) % seats.size
@@ -96,10 +96,15 @@ private fun HandState.finishRound(): HandState {
     }
     val newRound = when {
         round == "River" || everyoneAllIn -> {
+            val winners = calculateWinners()
             return copy(
                 currentAction = newCurrentAction,
-                seats = newSeats.map { it.copy(handStrength = (it.cards + communityCards).rateHand().handStrength) },
-                winners = calculateWinners()
+                winners = winners,
+                seats = newSeats.map { seat ->
+                    seat.copy(
+                        handStrength = (seat.cards + communityCards).rateHand().handStrength
+                    )
+                },
             ).finishHand()
         }
 
@@ -115,8 +120,16 @@ private fun HandState.finishRound(): HandState {
 }
 
 private fun HandState.finishHand(): HandState {
-    return handlePayouts().copy(
-        finished = true
+    val winners = calculateWinners()
+    val payouts = handlePayouts()
+    return payouts.copy(
+        finished = true,
+        winners = winners,
+        seats = payouts.seats.mapIndexed { index, seat ->
+            seat.copy(
+                lastAction = if (winners.contains(index)) "Winner" else seat.lastAction,
+            )
+        },
     )
 }
 
