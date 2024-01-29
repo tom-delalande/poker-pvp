@@ -57,7 +57,7 @@ suspend fun WebsocketGame.handleAction(playerId: Int, action: Action) {
         else -> hand
     }
     hand = hand.finishTurnForSeat(seatId)
-    val numberOfInPlayers = hand.seats.filter { !it.out && it.stack > 0 }
+    val numberOfInPlayers = hand.seats.filter { it.stack > 0 }
     val gameFinished = hand.finished && numberOfInPlayers.size == 1
 
     hand = hand.copy(
@@ -95,7 +95,7 @@ fun HandState.createHandStateForPlayer(gameId: Int, playerId: Int): HandStateFor
     val outOfTurn = currentAction.seatInTurn != seatId
     val actions = ActionBlock(
         checkFoldLabel = if (currentAction.minRaise > seat.currentRaise) "Fold" else "Check",
-        checkDisabled = (currentAction.minRaise > seat.currentRaise) || outOfTurn,
+        checkDisabled = (currentAction.minRaise < seat.currentRaise) || outOfTurn,
         callAmount = if (!outOfTurn && currentAction.minRaise > seat.currentRaise) currentAction.minRaise - seat.currentRaise else 0,
         callDisabled = outOfTurn || currentAction.minRaise <= seat.currentRaise,
         raiseDisabled = outOfTurn || currentAction.minRaise > seat.stack || seat.stack == 0,

@@ -145,7 +145,7 @@ private fun Map<Int, Int>.calculatePairCombinations(): PairCombinations {
     val fullHouse = mutableListOf<FullHouse>()
 
     forEach { (key, value) ->
-        if (pair.isEmpty() && value >= 3) {
+        if (pair.isNotEmpty() && value >= 3) {
             fullHouse.add(
                 FullHouse(
                     key,
@@ -153,7 +153,7 @@ private fun Map<Int, Int>.calculatePairCombinations(): PairCombinations {
                 )
             )
         }
-        if (threeOfAKind.isEmpty() && value >= 2) {
+        if (threeOfAKind.isNotEmpty() && value >= 2) {
             fullHouse.add(
                 FullHouse(
                     threeOfAKind.first(),

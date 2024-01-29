@@ -49,9 +49,12 @@ fun createInitialHandState(
 fun HandState.finishTurnForSeat(seatId: Int): HandState {
     if (currentAction.seatInTurn != seatId) return this
     val seatsIn = List(seats.filterNot { it.out }.size) { index -> index }
-    val winners = if (seatsIn.size == 1) {
-        seatsIn
-    } else emptyList()
+    if (seatsIn.size == 1) {
+        return copy(
+            winners = seatsIn,
+            finished = true,
+        )
+    }
 
     var newSeatInTurn = (currentAction.seatInTurn + 1) % seats.size
     while (seats[newSeatInTurn].out) {
