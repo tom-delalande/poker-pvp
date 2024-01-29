@@ -1,11 +1,5 @@
 package server
 
-import io.ktor.server.html.HtmlContent
-import io.ktor.server.html.Placeholder
-import io.ktor.server.html.Template
-import io.ktor.server.html.TemplatePlaceholder
-import io.ktor.server.html.insert
-import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.core.buildPacket
 import io.ktor.utils.io.core.readBytes
 import io.ktor.websocket.WebSocketSession
@@ -14,13 +8,6 @@ import java.util.Collections
 import kotlin.math.min
 import kotlinx.coroutines.delay
 import kotlinx.html.FlowContent
-import kotlinx.html.HTML
-import kotlinx.html.body
-import kotlinx.html.div
-import kotlinx.html.h1
-import kotlinx.html.html
-import kotlinx.html.stream.appendHTML
-import kotlinx.serialization.Serializable
 import logic.Card
 import logic.HandState
 import logic.finishTurnForSeat
@@ -55,7 +42,7 @@ data class PlayerWebsocket(
 
 data class Action(
     val action: String,
-    val amount: Int,
+    val amount: Int?,
 )
 
 val playersInQueue: MutableList<Int> = Collections.synchronizedList(mutableListOf<Int>())
@@ -66,7 +53,7 @@ suspend fun WebsocketGame.handleAction(playerId: Int, action: Action) {
     hand = when (action.action) {
         "CheckFold" -> hand.performCheckFold(seatId)
         "Call" -> hand.performCall(seatId)
-        "Raise" -> hand.performRaise(seatId, action.amount)
+        "Raise" -> hand.performRaise(seatId, action.amount ?: 0)
         else -> hand
     }
     hand = hand.finishTurnForSeat(seatId)
@@ -178,12 +165,12 @@ suspend fun WebSocketSession.sendNewUIChangesInPlayerState(
 }
 
 private suspend fun WebSocketSession.send(block: FlowContent.() -> Unit) {
-    send(buildPacket {
-        appendHTML().html {
-            body {
+    send(
+        buildPacket {
+            appendHTML().with {
                 block()
             }
-        }
-    }.readBytes())
+        }.readBytes()
+    )
 }
 

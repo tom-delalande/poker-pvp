@@ -15,8 +15,13 @@ import kotlin.random.Random
 import kotlinx.html.body
 import templates.actions
 import templates.game as gameTemplate
+import io.ktor.server.websocket.receiveDeserialized
+import io.ktor.server.websocket.webSocketRaw
+import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -69,20 +74,22 @@ fun Routing.queue() = route("/queue") {
 }
 
 fun Routing.game() = route("/game") {
+
     webSocket("/{gameId}/player/{playerId}/ws") {
         val gameId = call.parameters["gameId"]?.toInt() ?: return@webSocket call.respond(HttpStatusCode.BadRequest)
         val playerId = call.parameters["playerId"]?.toInt() ?: return@webSocket call.respond(HttpStatusCode.BadRequest)
-        val game = games.first { it.gameId == gameId }
+        val game = games.find { it.gameId == gameId } ?: return@webSocket call.respond(HttpStatusCode.BadRequest)
         val initialPlayerState = game.hand.createHandStateForPlayer(gameId, playerId)
         game.playerWebsockets.add(PlayerWebsocket(playerId, this, initialPlayerState))
         sendNewUIChangesInPlayerState(null, initialPlayerState)
+
         for (frame in incoming) {
-            frame as? Frame.Text ?: continue
+            if (frame !is Frame.Text) throw IllegalStateException("Unsupported frame type")
             val receivedText = frame.readText()
             val actionRequest = json.decodeFromString<ActionRequest>(receivedText)
             val action = Action(
                 actionRequest.action,
-                actionRequest.amount.toInt(),
+                actionRequest.amount?.toInt(),
             )
             game.handleAction(playerId, action)
         }
@@ -117,5 +124,5 @@ val json = Json {
 @Serializable
 data class ActionRequest(
     val action: String,
-    val amount: String,
+    val amount: String? = null,
 )

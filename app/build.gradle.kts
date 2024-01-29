@@ -24,7 +24,7 @@ repositories {
 tasks.test {
     useJUnitPlatform()
 }
-val ktorVersion = "2.1.0"
+val ktorVersion = "2.3.7"
 dependencies {
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
@@ -33,4 +33,8 @@ dependencies {
     implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
     implementation("io.ktor:ktor-server-websockets:$ktorVersion")
     implementation("org.slf4j:slf4j-simple:2.0.0-beta1")
+
+
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
+    testImplementation(kotlin("test"))
 }

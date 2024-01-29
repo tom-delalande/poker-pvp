@@ -34,7 +34,7 @@ fun FlowContent.game(state: HandStateForPlayer) = div {
     }
 }
 
-fun FlowContent.opponents(opponents: List<Opponent>) = div {
+fun FlowContent.opponents(opponents: List<Opponent>) =  div {
     id = "opponents"
 
     classes = setOf("flex flex-col justify-center items-center")

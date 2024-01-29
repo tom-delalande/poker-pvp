@@ -32,7 +32,9 @@ fun HTML.index() {
             rel = "stylesheet"
         }
         script {
-            src = "https://unpkg.com/htmx.org@1.9.5"
+            src = "https://unpkg.com/htmx.org@1.9.10"
+            integrity = "sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+            attributes["crossorigin"] = "anonymous"
         }
         script {
             src = "https://unpkg.com/htmx.org/dist/ext/ws.js"
