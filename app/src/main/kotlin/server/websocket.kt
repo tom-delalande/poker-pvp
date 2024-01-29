@@ -170,7 +170,7 @@ private suspend fun WebSocketSession.send(block: FlowContent.() -> Unit) {
             appendHTML().with {
                 block()
             }
-        }.readBytes()
+        }.readText()
     )
 }
 
